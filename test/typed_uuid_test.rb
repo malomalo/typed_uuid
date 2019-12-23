@@ -5,7 +5,7 @@ class FilterTest < ActiveSupport::TestCase
   schema do
     ActiveRecord::Base.register_uuid_types({
       listings: 0,
-      buildings: 255
+      buildings: 65_535
     })
     
     create_table :listings, id: :typed_uuid do |t|
@@ -29,7 +29,7 @@ class FilterTest < ActiveSupport::TestCase
     })
 
     exprexted_sql = <<-SQL
-      CREATE TABLE "properties" ("id" uuid DEFAULT encode( set_byte(gen_random_bytes(16), 6, 1), 'hex')::uuid NOT NULL PRIMARY KEY, "name" character varying(255))
+      CREATE TABLE "properties" ("id" uuid DEFAULT typed_uuid('\\x1000') NOT NULL PRIMARY KEY, "name" character varying(255))
     SQL
 
     assert_sql exprexted_sql do
@@ -41,23 +41,23 @@ class FilterTest < ActiveSupport::TestCase
     end
   end
 
-  test 'uuid of a new record' do
+  test 'class_from uuid' do
     listing = Listing.create
     building = Building.create
     
-    assert_equal '00', listing.id.gsub('-', '')[12..13]
-    assert_equal 'ff', building.id.gsub('-', '')[12..13]
+    assert_equal FilterTest::Listing, ::ActiveRecord::Base.class_from_uuid(listing.id)
+    assert_equal FilterTest::Building, ::ActiveRecord::Base.class_from_uuid(building.id)
   end
   
-  test 'uuid_type_from_table_name' do
+  test 'uuid_type from table_name' do
     assert_equal 0, ::ActiveRecord::Base.uuid_type_from_table_name(:listings)
     assert_equal 0, ::ActiveRecord::Base.uuid_type_from_table_name('listings')
-    assert_equal 255, ::ActiveRecord::Base.uuid_type_from_table_name(:buildings)
+    assert_equal 65_535, ::ActiveRecord::Base.uuid_type_from_table_name(:buildings)
   end
   
-  test 'class_from_uuid_type' do
+  test 'class from uuid_type' do
     assert_equal FilterTest::Listing, ::ActiveRecord::Base.class_from_uuid_type(0)
-    assert_equal FilterTest::Building, ::ActiveRecord::Base.class_from_uuid_type(255)
+    assert_equal FilterTest::Building, ::ActiveRecord::Base.class_from_uuid_type(65_535)
   end
   
 end

@@ -13,12 +13,19 @@ require 'byebug'
 require "minitest/autorun"
 require 'minitest/unit'
 require 'minitest/reporters'
+require 'mocha/minitest'
 require 'active_support'
 require 'active_record'
 require 'rails'
 require 'typed_uuid'
 require 'typed_uuid/railtie'
+require File.expand_path('../../db/migrate/20191122234546_add_typed_uuid_function', __FILE__)
 
+module ActiveRecord::Tasks::DatabaseTasks
+  def migrations_paths
+    []
+  end
+end
 TypedUUID::Railtie.initializers.each(&:run)
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
@@ -55,8 +62,8 @@ class ActiveSupport::TestCase
     
       ActiveRecord::Base.establish_connection(configuration)
       ActiveRecord::Migration.suppress_messages do
-        ActiveRecord::Schema.enable_extension "pgcrypto"
-      
+        AddTypedUuidFunction.migrate :up
+        
         if self.class.class_variable_defined?(:@@schema)
           ActiveRecord::Schema.define(&self.class.class_variable_get(:@@schema))
           ActiveRecord::Migration.execute("SELECT c.relname FROM pg_class c WHERE c.relkind = 'S'").each_row do |row|

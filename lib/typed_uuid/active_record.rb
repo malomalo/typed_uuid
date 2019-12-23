@@ -10,8 +10,8 @@ module TypedUUID::ActiveRecord
   end
   
   def register_uuid_type(table, int)
-    if int < 0 || int > 255
-      raise ArgumentError, "UUID type must be between 0 and 255"
+    if int < 0 || int > 65_535
+      raise ArgumentError, "UUID type must be between 0 and 65,535"
     elsif defined_uuid_types.has_key?(int)
       raise ArgumentError, UUID_TYPE_CONFLICT_MESSAGE % {
         int: int,
@@ -57,6 +57,11 @@ module TypedUUID::ActiveRecord
       
       uuid_type_cache[type]
     end
+  end
+  
+  def class_from_uuid(uuid)
+    uuid = uuid.gsub('-', '')
+    class_from_uuid_type(uuid[8..11].to_i(16) ^ uuid[12..15].to_i(16))
   end
   
 end
