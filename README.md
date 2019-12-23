@@ -13,18 +13,18 @@ Where:
 - N is 3 bits and is the Variant of the Version followed a bit
 
 We modify this and use the following structure where the 7th & 8th bytes in the
-UUID are enum XORed with bytes 5 & 6.
+UUID are enum XORed with the result of XORing bytes 5 & 6 with bytes 9 & 10.
 
-`xxxxxxxx-YYYY-TTTT-xxxx-xxxxxxxxxxxx`
+`xxxxxxxx-YYYY-TTTT-ZZZZ-xxxxxxxxxxxx`
 
 Where:
 
-- TTTT is the Class ENUM 0bNNNN_NNNN_NNNN_NNNN (0 - 65,535) XORed with YYYY
-- YYYY are the bytes to be XORed with the Class ENUM to produce the identifying
-  bytes
+- TTTT is the Type ENUM 0bNNNN_NNNN_NNNN_NNNN (0 - 65,535) XORed with (YYYY xor ZZZZ)
+- YYYY bytes XORed with ZZZZ and the Type ENUM to produce the identifying bytes
+- ZZZZ bytes XORed with YYYY and the Type ENUM to produce the identifying bytes
 
-XORing bytes 7 & 8 with bytes 5 & 6 of the Typed UUID will give us back the ENUM
-of the Type using soley the UUID.
+XORing bytes 5 & 6 with 9 & 10 and XORing again with bytes 5 & 6 of the Typed UUID
+will give us back the ENUM of the Type using soley the UUID.
 
 ## Install
 

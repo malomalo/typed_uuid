@@ -61,7 +61,7 @@ module TypedUUID::ActiveRecord
   
   def class_from_uuid(uuid)
     uuid = uuid.gsub('-', '')
-    class_from_uuid_type(uuid[8..11].to_i(16) ^ uuid[12..15].to_i(16))
+    class_from_uuid_type((uuid[8..11].to_i(16) ^ uuid[16..19].to_i(16)) ^ uuid[12..15].to_i(16))
   end
   
 end

@@ -19,7 +19,7 @@ require 'active_record'
 require 'rails'
 require 'typed_uuid'
 require 'typed_uuid/railtie'
-require File.expand_path('../../db/migrate/20191122234546_add_typed_uuid_function', __FILE__)
+require File.expand_path('../../db/migrate/20191222234546_add_typed_uuid_function', __FILE__)
 
 module ActiveRecord::Tasks::DatabaseTasks
   def migrations_paths
