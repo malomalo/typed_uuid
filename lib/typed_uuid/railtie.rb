@@ -8,7 +8,9 @@ class TypedUUID::Railtie < Rails::Railtie
     end
     
     require 'active_record/connection_adapters/postgresql/schema_definitions'    
-    ActiveRecord::ConnectionAdapters::PostgreSQL::TableDefinition.include TypedUUID::PsqlColumnMethods
+    ActiveRecord::ConnectionAdapters::PostgreSQL::TableDefinition.include(TypedUUID::PsqlColumnMethods)
+    
+    ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaDumper.prepend(TypedUUID::PsqlSchemaDumper)
   end
 
 end
