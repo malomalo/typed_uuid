@@ -5,7 +5,7 @@ class FilterTest < ActiveSupport::TestCase
   schema do
     ActiveRecord::Base.register_uuid_types({
       listings: 0,
-      buildings: 65_535
+      buildings: 592
     })
     
     create_table :listings, id: :typed_uuid do |t|
@@ -29,7 +29,7 @@ class FilterTest < ActiveSupport::TestCase
     })
 
     exprexted_sql = <<-SQL
-      CREATE TABLE "properties" ("id" uuid DEFAULT typed_uuid('\\x1000') NOT NULL PRIMARY KEY, "name" character varying(255))
+      CREATE TABLE "properties" ("id" uuid DEFAULT typed_uuid('\\x0001') NOT NULL PRIMARY KEY, "name" character varying(255))
     SQL
 
     assert_sql exprexted_sql do
@@ -58,12 +58,12 @@ class FilterTest < ActiveSupport::TestCase
   test 'uuid_type from table_name' do
     assert_equal 0, ::ActiveRecord::Base.uuid_type_from_table_name(:listings)
     assert_equal 0, ::ActiveRecord::Base.uuid_type_from_table_name('listings')
-    assert_equal 65_535, ::ActiveRecord::Base.uuid_type_from_table_name(:buildings)
+    assert_equal 592, ::ActiveRecord::Base.uuid_type_from_table_name(:buildings)
   end
   
   test 'class from uuid_type' do
     assert_equal FilterTest::Listing, ::ActiveRecord::Base.class_from_uuid_type(0)
-    assert_equal FilterTest::Building, ::ActiveRecord::Base.class_from_uuid_type(65_535)
+    assert_equal FilterTest::Building, ::ActiveRecord::Base.class_from_uuid_type(592)
   end
   
 end
