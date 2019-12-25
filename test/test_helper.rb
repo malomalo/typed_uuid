@@ -50,6 +50,7 @@ class ActiveSupport::TestCase
   end
   
   set_callback(:setup, :before) do
+    Rails.stubs(:application).returns(stub(config: stub(eager_load: true)))
     if !self.class.class_variable_defined?(:@@suite_setup_run)
       configuration = {
         adapter:  "postgresql",

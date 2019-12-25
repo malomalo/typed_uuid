@@ -41,6 +41,12 @@ class FilterTest < ActiveSupport::TestCase
     end
   end
 
+  test 'typed_uuid' do
+    assert_equal 512, TypedUUID.enum(TypedUUID.uuid(512))
+    assert_equal FilterTest::Listing, ::ActiveRecord::Base.class_from_uuid(Listing.typed_uuid)
+    assert_equal FilterTest::Building, ::ActiveRecord::Base.class_from_uuid(Building.typed_uuid)
+  end
+  
   test 'class_from uuid' do
     listing = Listing.create
     building = Building.create

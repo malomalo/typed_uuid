@@ -33,8 +33,21 @@ module TypedUUID::ActiveRecord
     end
   end
 
+  def typed_uuid
+    TypedUUID.uuid(uuid_type_from_class(self))
+  end
+  
   def uuid_type_from_table_name(table)
     type = defined_uuid_types.key(table.to_s)
+    if type.nil?
+      raise ArgumentError, "UUID Type for \"#{table}\" not defined"
+    end
+    
+    type
+  end
+
+  def uuid_type_from_class(klass)
+    type = defined_uuid_types.key(klass.table_name)
     if type.nil?
       raise ArgumentError, "UUID Type for \"#{table}\" not defined"
     end
@@ -46,7 +59,7 @@ module TypedUUID::ActiveRecord
     if klass = uuid_type_cache[type]
       return klass 
     else
-      # Rails.application.eager_load! if !Rails.application.config.eager_load
+      Rails.application.eager_load! if !Rails.application.config.eager_load
 
       ::ActiveRecord::Base.descendants.select do |klass|
         next unless ( klass.superclass == ::ActiveRecord::Base || klass.superclass.abstract_class? )
@@ -60,8 +73,7 @@ module TypedUUID::ActiveRecord
   end
   
   def class_from_uuid(uuid)
-    uuid = uuid.gsub('-', '')
-    class_from_uuid_type((uuid[8..11].to_i(16) ^ uuid[16..19].to_i(16)) ^ uuid[12..15].to_i(16))
+    class_from_uuid_type(TypedUUID.enum(uuid))
   end
   
 end
