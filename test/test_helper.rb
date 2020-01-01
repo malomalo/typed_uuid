@@ -52,6 +52,9 @@ class ActiveSupport::TestCase
   set_callback(:setup, :before) do
     Rails.stubs(:application).returns(stub(config: stub(eager_load: true)))
     if !self.class.class_variable_defined?(:@@suite_setup_run)
+      ActiveRecord::Base.defined_uuid_types = {}
+      ActiveRecord::Base.uuid_type_cache = {}
+      
       configuration = {
         adapter:  "postgresql",
         database: "uuid-types-test",
@@ -76,14 +79,14 @@ class ActiveSupport::TestCase
     self.class.class_variable_set(:@@suite_setup_run, true)
   end
 
-  # def debug
-  #   ActiveRecord::Base.logger = Logger.new(STDOUT)
-  #   $debugging = true
-  #   yield
-  # ensure
-  #   ActiveRecord::Base.logger = nil
-  #   $debugging = false
-  # end
+  def debug
+    ActiveRecord::Base.logger = Logger.new(STDOUT)
+    $debugging = true
+    yield
+  ensure
+    ActiveRecord::Base.logger = nil
+    $debugging = false
+  end
 
   def capture_sql
     # ActiveRecord::Base.connection.materialize_transactions

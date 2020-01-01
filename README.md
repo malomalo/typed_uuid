@@ -33,23 +33,26 @@ Add this to your Gemfile:
 `gem 'typed_uuid'`
 
 Once bundled you can add an initializer to Rails to register your types as shown
-below. This maps the __table_names__ of the models to an integer between 0 and 255.
+below. This maps the __Model Classes__ to an integer between 0 and 65,535.
 
 ```ruby
 # config/initializers/uuid_types.rb
 
 ActiveRecord::Base.register_uuid_types({
-  listings: 	0,
-  buildings: 	65_535
+  Listing: 	                0,
+  Building:                 512,
+  'Building::SkyScrpaer' => 65_535
 })
 
 # Or:
 
 ActiveRecord::Base.register_uuid_types({
-  0 		=> :listings,
-  65_535 	=> :buildings
+  0         => :Listing,
+  512       => :Building,
+  65_535    => 'Building::SkyScrpaer'
 })
 ```
+
 
 ## Usage
 
@@ -65,3 +68,11 @@ class CreateProperties < ActiveRecord::Migration[5.2]
   end
 end
 ```
+
+## STI Models
+When using STI Model Rails will generate the UUID to be inserted. This UUID will
+be calculated of the STI Model class and not the base class.
+
+In the migration you can still used `id: :typed_uuid`, this will use the base
+class to calculated the default type for the UUID. You could also set the
+`id` to `:uuid` and the `default` to `false` so when no ID is given it will error.

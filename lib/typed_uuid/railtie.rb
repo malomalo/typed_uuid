@@ -4,7 +4,7 @@ class TypedUUID::Railtie < Rails::Railtie
     ActiveRecord::Tasks::DatabaseTasks.migrations_paths << File.expand_path('../../../db/migrate', __FILE__)
     
     ActiveSupport.on_load(:active_record) do
-      ActiveRecord::Base.extend TypedUUID::ActiveRecord
+      ActiveRecord::Base.include TypedUUID::ActiveRecord
     end
     
     require 'active_record/connection_adapters/postgresql/schema_definitions'

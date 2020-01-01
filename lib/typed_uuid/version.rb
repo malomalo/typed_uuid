@@ -1,3 +1,3 @@
 module TypedUUID
-  VERSION = '2.3'
+  VERSION = '3.0'
 end
