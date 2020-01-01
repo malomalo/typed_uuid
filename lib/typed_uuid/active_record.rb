@@ -9,7 +9,10 @@ module TypedUUID::ActiveRecord
 
   included do
     class_attribute(:defined_uuid_types, instance_writer: false, default: {})
-    class_attribute(:uuid_type_cache, instance_writer: false, default: {})
+    class_attribute(:class_to_uuid_type_cache, instance_writer: false, default: Hash.new { |hash, klass|
+      hash[klass] = defined_uuid_types.key(klass.name)
+    })
+    class_attribute(:uuid_type_to_class_cache, instance_writer: false, default: {})
   end
   
   def _create_record
@@ -48,7 +51,7 @@ module TypedUUID::ActiveRecord
     end
 
     def typed?
-      !!defined_uuid_types.key(self.base_class.name)
+      !!class_to_uuid_type_cache[self.base_class]
     end
     
     def typed_uuid
@@ -60,28 +63,28 @@ module TypedUUID::ActiveRecord
     end
 
     def uuid_type_from_class(klass)
-      type = defined_uuid_types.key(klass.name)
-      
+      type = class_to_uuid_type_cache[klass]
+
       if type.nil?
         raise ArgumentError, "UUID Type for \"#{klass.name}\" not defined"
       end
-    
+
       type
     end
   
     def class_from_uuid_type(type)
-      if klass = uuid_type_cache[type]
-        return klass 
+      klass = if uuid_type_to_class_cache.has_key?(type)
+        uuid_type_to_class_cache[type]
       else
         Rails.application.eager_load! if !Rails.application.config.eager_load
 
         ::ActiveRecord::Base.descendants.each do |klass|
           next if klass.table_name.nil?
         
-          uuid_type_cache[defined_uuid_types.key(klass.name)] = klass
+          uuid_type_to_class_cache[defined_uuid_types.key(klass.name)] = klass
         end
       
-        uuid_type_cache[type]
+        uuid_type_to_class_cache[type]
       end
     end
   
