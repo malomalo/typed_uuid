@@ -24,8 +24,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'byebug'
   s.add_development_dependency 'activesupport', '>= 6.0.0'
   s.add_development_dependency 'rails', '>= 6.0.0'
+  s.add_development_dependency 'pg'
   
   # Runtime
-  s.add_runtime_dependency 'pg'
   s.add_runtime_dependency 'activerecord', '>= 6.0.0'
 end
