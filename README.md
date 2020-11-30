@@ -7,24 +7,35 @@ a hex representation of 4 bits.
 
 `xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx`
 
-Where:
-
 - M is 4 bits and is the Version
 - N is 3 bits and is the Variant of the Version followed a bit
 
-We modify this and use the following structure where the 7th & 8th bytes in the
-UUID are enum XORed with the result of XORing bytes 5 & 6 with bytes 9 & 10.
+We modify this and use the following structure where the 9th & 10th bytes in the
+UUID are the enum XORed with the result of XORing bytes 7 & 8 with bytes 11 & 12.
 
-`xxxxxxxx-YYYY-TTTT-ZZZZ-xxxxxxxxxxxx`
+`xxxxxxxx-xxxx-YYYY-TTTT-ZZZZxxxxxxxx`
 
 Where:
 
-- TTTT is the Type ENUM 0bNNNN_NNNN_NNNN_NNNN (0 - 65,535) XORed with (YYYY xor ZZZZ)
+- TTTT is the Type ENUM & Version 0bEEEE_EEEE_EEEE_EVVV; XORed with (YYYY xor ZZZZ)
+    - The Es are the bits of the 13 bit ENUM supporting 8,192 enums/types (0 - 8,191)
+    - The Vs are the bits in the 3 bit version supporting 8 versions (0 - 7)
 - YYYY bytes XORed with ZZZZ and the Type ENUM to produce the identifying bytes
 - ZZZZ bytes XORed with YYYY and the Type ENUM to produce the identifying bytes
 
-XORing bytes 5 & 6 with 9 & 10 and XORing again with bytes 5 & 6 of the Typed UUID
-will give us back the ENUM of the Type using soley the UUID.
+XORing bytes 7 & 8 with 11 & 12 and XORing again with bytes 9 & 10 of the
+Typed UUID will give us back the ENUM and Version of the Type using soley the UUID.
+
+## Versions
+
+As with regular UUID Typed UUIDs come in multiple version. The current versions are:
+
+- Version 1: A timebased UUID where the first 64 bits are an unsigned integer
+             representing the nanoseconds since epoch. The following 16 bits are
+             the UUID type folled by 48 random bits.
+
+- Version 4: A random UUID where the first 64 bits are random. The following
+             16 bits are the UUID type folled by another 48 random bits.
 
 ## Install
 
@@ -40,8 +51,9 @@ below. This maps the __Model Classes__ to an integer between 0 and 65,535.
 
 ActiveRecord::Base.register_uuid_types({
   Listing: 	                0,
-  Building:                 512,
-  'Building::SkyScrpaer' => 65_535
+  Address:                  {enum: 5},
+  Building:                 {enum: 512, version: 1},
+  'Building::SkyScrpaer' => 8_191
 })
 
 # Or:
@@ -49,7 +61,7 @@ ActiveRecord::Base.register_uuid_types({
 ActiveRecord::Base.register_uuid_types({
   0         => :Listing,
   512       => :Building,
-  65_535    => 'Building::SkyScrpaer'
+  8_191    => 'Building::SkyScrpaer'
 })
 ```
 

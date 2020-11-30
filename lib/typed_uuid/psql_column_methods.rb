@@ -2,9 +2,10 @@ module TypedUUID::PsqlColumnMethods
 
   def primary_key(name, type = :primary_key, **options)
     if type == :typed_uuid
-      klass_enum = ::ActiveRecord::Base.uuid_type_from_table_name(self.name)
+      klass_type_enum = ::ActiveRecord::Base.uuid_enum_from_table_name(self.name)
+      klass_type_version = ::ActiveRecord::Base.uuid_version_from_table_name(self.name)
       options[:id] = :uuid
-      options[:default] ||= -> { "typed_uuid('\\x#{klass_enum.to_s(16).rjust(4, '0')}')" }
+      options[:default] ||= -> { "typed_uuid(#{klass_type_enum}, #{klass_type_version})" }
       super(name, :uuid, **options)
     else
       super

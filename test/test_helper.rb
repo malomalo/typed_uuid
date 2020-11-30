@@ -53,7 +53,7 @@ class ActiveSupport::TestCase
     Rails.stubs(:application).returns(stub(config: stub(eager_load: true)))
     if !self.class.class_variable_defined?(:@@suite_setup_run)
       ActiveRecord::Base.defined_uuid_types.clear
-      ActiveRecord::Base.uuid_type_to_class_cache.clear
+      ActiveRecord::Base.uuid_enum_to_class_cache.clear
       ActiveRecord::Base.class_to_uuid_type_cache.clear
       
       configuration = {
