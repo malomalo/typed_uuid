@@ -81,6 +81,32 @@ class CreateProperties < ActiveRecord::Migration[5.2]
 end
 ```
 
+To add a typed UUID to an existing table:
+
+```ruby
+class UpdateProperties < ActiveRecord::Migration[6.1]
+  def change
+    klass_enum = ::ActiveRecord::Base.uuid_type_from_table_name(:properties)
+    
+    # Add the column
+    add_column :properties, :typed_uuid, :uuid, default: -> { "typed_uuid('\\x#{klass_enum.to_s(16).rjust(4, '0')}')" }
+    
+    # Update existing properties with a new typed UUID
+    execute "UPDATE properties SET id = typed_uuid('\\x#{klass_enum.to_s(16).rjust(4, '0')}');"
+    
+    # Add null constraint since we'll swap these out for the primary key
+    change_column_null :properties, :typed_uuid, false
+    
+    # TODO: Here you will want to update any reference to the old primary key
+    # with the new typed_uuid that will be the new primary key.
+    
+    # Replace the old primary key with the typed_uuid
+    execute "ALTER TABLE properties DROP CONSTRAINT properties_pkey;"
+    rename_column :properties, :typed_uuid, :id
+    execute "ALTER TABLE properties ADD PRIMARY KEY (id);"
+  end
+```
+
 ## STI Models
 When using STI Model Rails will generate the UUID to be inserted. This UUID will
 be calculated of the STI Model class and not the base class.
