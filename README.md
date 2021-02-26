@@ -85,6 +85,9 @@ class UpdateProperties < ActiveRecord::Migration[6.1]
     # Add null constraint since we'll swap these out for the primary key
     change_column_null :properties, :typed_uuid, false
     
+    # TODO: Here you will want to update any reference to the old primary key
+    # with the new typed_uuid that will be the new primary key.
+    
     # Replace the old primary key with the typed_uuid
     execute "ALTER TABLE properties DROP CONSTRAINT properties_pkey;"
     rename_column :properties, :typed_uuid, :id
