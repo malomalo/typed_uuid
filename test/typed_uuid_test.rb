@@ -85,7 +85,7 @@ class FilterTest < ActiveSupport::TestCase
   end
   
   test 'typed_uuid v1' do
-    time = Time.at(1606612254, 370979123, :nsec)
+    time = Time.at(1606612254, 370979, :usec)
     Time.stubs(:now).returns(time)
 
     uuid = TypedUUID.uuid(592, 1)

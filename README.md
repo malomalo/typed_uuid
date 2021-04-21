@@ -10,10 +10,10 @@ a hex representation of 4 bits.
 - M is 4 bits and is the Version
 - N is 3 bits and is the Variant of the Version followed a bit
 
-We modify this and use the following structure where the 9th & 10th bytes in the
-UUID are the enum XORed with the result of XORing bytes 7 & 8 with bytes 11 & 12.
+We modify this and use the following structure where the 15th & 16th bytes in the
+UUID are the enum XORed with the result of XORing bytes 5 & 6 with bytes 13 & 14.
 
-`xxxxxxxx-xxxx-YYYY-TTTT-ZZZZxxxxxxxx`
+`xxxxxxxx-YYYY-xxxx-xxxx-xxxxZZZZTTTT`
 
 Where:
 
@@ -23,19 +23,20 @@ Where:
 - YYYY bytes XORed with ZZZZ and the Type ENUM to produce the identifying bytes
 - ZZZZ bytes XORed with YYYY and the Type ENUM to produce the identifying bytes
 
-XORing bytes 7 & 8 with 11 & 12 and XORing again with bytes 9 & 10 of the
+XORing bytes 5 & 6 with 13 & 14 and XORing again with bytes 15 & 16 of the
 Typed UUID will give us back the ENUM and Version of the Type using soley the UUID.
 
 ## Versions
 
 As with regular UUID Typed UUIDs come in multiple version. The current versions are:
 
-- Version 1: A timebased UUID where the first 64 bits are an unsigned integer
-             representing the nanoseconds since epoch. The following 16 bits are
-             the UUID type folled by 48 random bits.
+- Version 1: A timebased UUID where the first 56 bits are an unsigned integer
+             representing the microseconds since epoch. Followed by 48 random
+             bits or a sequence counter. Then 8 random bits followed by 16 bits
+             which are the UUID type.
 
-- Version 4: A random UUID where the first 64 bits are random. The following
-             16 bits are the UUID type folled by another 48 random bits.
+- Version 4: A random UUID where the first 112 bits are random. The following
+             16 bits are the UUID type.
 
 ## Install
 

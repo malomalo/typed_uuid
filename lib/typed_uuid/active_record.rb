@@ -64,8 +64,8 @@ module TypedUUID::ActiveRecord
       !!class_to_uuid_type_cache[self.base_class]
     end
     
-    def typed_uuid
-      TypedUUID.uuid(uuid_enum_from_class(self), uuid_version_from_class(self))
+    def typed_uuid(**options)
+      TypedUUID.uuid(uuid_enum_from_class(self), uuid_version_from_class(self), **options)
     end
     
     def uuid_enum_from_table_name(table)

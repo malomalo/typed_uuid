@@ -12,17 +12,16 @@ class AddTypedUuidFunction < ActiveRecord::Migration[6.0]
         BEGIN
           IF version = 1 THEN
             bytes := decode(concat(
-                to_hex((extract(epoch from clock_timestamp())*1000000000)::bigint),
-                encode(gen_random_bytes(8), 'hex')
+                lpad(right(to_hex((extract(epoch from clock_timestamp())*1000000)::bigint), 12), 12, '0'),
+                encode(gen_random_bytes(10), 'hex')
             ), 'hex');
           ELSE
             bytes := gen_random_bytes(16);
-            version := 4;
           END IF;
 
           type := decode( lpad(to_hex(((enum << 3) | version)), 4, '0'), 'hex');
-          bytes := set_byte(bytes, 8, (get_byte(bytes, 6) # get_byte(bytes, 10)) # get_byte(type, 0));
-          bytes := set_byte(bytes, 9, (get_byte(bytes, 7) # get_byte(bytes, 11)) # get_byte(type, 1));
+          bytes := set_byte(bytes, 14, (get_byte(bytes, 4) # get_byte(bytes, 12)) # get_byte(type, 0));
+          bytes := set_byte(bytes, 15, (get_byte(bytes, 5) # get_byte(bytes, 13)) # get_byte(type, 1));
           
           RETURN encode( bytes, 'hex') :: uuid;
         END;
