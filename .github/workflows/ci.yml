@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    name: TypedUUID Test
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.0
+
+      - uses: actions/checkout@v2
+
+      - run: |
+          sudo systemctl start postgresql.service
+          sudo -u postgres createdb uuid-types-test
+
+      - run: bundle
+
+      - run: bundle exec rake test
