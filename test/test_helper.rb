@@ -30,7 +30,7 @@ TypedUUID::Railtie.initializers.each(&:run)
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
 class ActiveSupport::TestCase
-  
+
   # File 'lib/active_support/testing/declarative.rb'
   def self.test(name, &block)
     test_name = "test_#{name.gsub(/\s+/, '_')}".to_sym
@@ -44,31 +44,32 @@ class ActiveSupport::TestCase
       end
     end
   end
-  
+
   def self.schema(&block)
     self.class_variable_set(:@@schema, block)
   end
-  
+
   set_callback(:setup, :before) do
     Rails.stubs(:application).returns(stub(config: stub(eager_load: true)))
     if !self.class.class_variable_defined?(:@@suite_setup_run)
       ActiveRecord::Base.defined_uuid_types.clear
       ActiveRecord::Base.uuid_enum_to_class_cache.clear
       ActiveRecord::Base.class_to_uuid_type_cache.clear
-      
+
       configuration = {
         adapter:  "postgresql",
         database: "uuid-types-test",
         encoding: "utf8"
       }.stringify_keys
-  
-      db_tasks = ActiveRecord::Tasks::PostgreSQLDatabaseTasks.new(configuration)
-      db_tasks.purge
-    
+
       ActiveRecord::Base.establish_connection(configuration)
+
+      db_tasks = ActiveRecord::Tasks::PostgreSQLDatabaseTasks.new(ActiveRecord::Base.connection_db_config)
+      db_tasks.purge
+
       ActiveRecord::Migration.suppress_messages do
         AddTypedUuidFunction.migrate :up
-        
+
         if self.class.class_variable_defined?(:@@schema)
           ActiveRecord::Schema.define(&self.class.class_variable_get(:@@schema))
           ActiveRecord::Migration.execute("SELECT c.relname FROM pg_class c WHERE c.relkind = 'S'").each_row do |row|
@@ -132,7 +133,7 @@ class ActiveSupport::TestCase
       end
     end
   end
-  
+
   class SQLLogger
     class << self
       attr_accessor :ignored_sql, :log, :log_all
@@ -195,5 +196,5 @@ class ActiveSupport::TestCase
   alias :assert_not_predicate :refute_predicate
   alias :assert_not_respond_to :refute_respond_to
   alias :assert_not_same :refute_same
-  
+
 end

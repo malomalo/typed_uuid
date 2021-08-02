@@ -44,7 +44,7 @@ module TypedUUID
 
     def namebased_uuid(enum, digester:, name:, namespace: "")
       uuid = digester.digest(name + namespace).unpack("nnnnnnnn")
-      uuid[7] = (digest[2] ^ digest[6]) ^ ((enum << 3) | 5)
+      uuid[7] = (uuid[2] ^ uuid[6]) ^ ((enum << 3) | 5)
       "%04x%04x-%04x-%04x-%04x-%04x%04x%04x" % uuid
     end
 
