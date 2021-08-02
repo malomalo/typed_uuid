@@ -75,6 +75,9 @@ class FilterTest < ActiveSupport::TestCase
 
   test 'typed_uuid' do
     assert_equal 512, TypedUUID.enum(TypedUUID.uuid(512))
+    assert_equal 512, TypedUUID.enum(TypedUUID.uuid(512, 1))
+    assert_equal 512, TypedUUID.enum(TypedUUID.uuid(512, 3, name: "test"))
+    assert_equal 512, TypedUUID.enum(TypedUUID.uuid(512, 5, name: "test"))
     assert_equal FilterTest::Listing,    ::ActiveRecord::Base.class_from_uuid(Listing.typed_uuid)
     assert_equal FilterTest::Building,   ::ActiveRecord::Base.class_from_uuid(Building.typed_uuid)
     assert_equal FilterTest::SkyScraper, ::ActiveRecord::Base.class_from_uuid(SkyScraper.typed_uuid)
