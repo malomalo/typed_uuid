@@ -20,6 +20,7 @@ jobs:
 
       - run: |
           sudo systemctl start postgresql.service
+          sudo -u postgres createuser runner --superuser
           sudo -u postgres createdb uuid-types-test
 
       - run: bundle
