@@ -16,11 +16,11 @@ module TypedUUID
       when 1
         timestamp_uuid(enum, **options)
       when 3
-        md5_namebased_uuid(enum, **options)
+        namebased_uuid(enum, digester: Digest::MD5, **options)
       when 4
         random_uuid(enum, **options)
       when 5
-        sha1_namebased_uuid(enum, **options)
+        namebased_uuid(enum, digester: Digest::SHA1, **options)
       end
     end
 
@@ -42,14 +42,8 @@ module TypedUUID
       "%04x%04x-%04x-%04x-%04x-%04x%04x%04x" % uuid
     end
 
-    def md5_namebased_uuid(enum, name:, namespace: "")
-      uuid = Digest::MD5.digest(name + namespace).unpack("nnnnnnnn")
-      uuid[7] = (digest[2] ^ digest[6]) ^ ((enum << 3) | 5)
-      "%04x%04x-%04x-%04x-%04x-%04x%04x%04x" % uuid
-    end
-
-    def sha1_namebased_uuid(enum, name:, namespace: "")
-      uuid = Digest::SHA1.digest(name + namespace).unpack("nnnnnnnn")
+    def namebased_uuid(enum, digester:, name:, namespace: "")
+      uuid = digester.digest(name + namespace).unpack("nnnnnnnn")
       uuid[7] = (digest[2] ^ digest[6]) ^ ((enum << 3) | 5)
       "%04x%04x-%04x-%04x-%04x-%04x%04x%04x" % uuid
     end
