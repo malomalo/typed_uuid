@@ -70,7 +70,7 @@ ActiveRecord::Base.register_uuid_types({
 ActiveRecord::Base.register_uuid_types({
   0         => :Listing,
   512       => :Building,
-  8_191    => 'Building::SkyScrpaer'
+  8_191     => 'Building::SkyScrpaer'
 })
 ```
 
@@ -83,7 +83,7 @@ a table.
 ```ruby
 class CreateProperties < ActiveRecord::Migration[5.2]
   def change
-	create_table :properties, id: :typed_uuid do |t|
+    create_table :properties, id: :typed_uuid do |t|
       t.string "name", limit: 255
     end
   end
@@ -114,6 +114,12 @@ class UpdateProperties < ActiveRecord::Migration[6.1]
     rename_column :properties, :typed_uuid, :id
     execute "ALTER TABLE properties ADD PRIMARY KEY (id);"
   end
+```
+
+When you need to lookup they class of a TypedUUID:
+
+```ruby
+ActiveRecord::Base.class_from_uuid(my_uuid) #=> MyClass
 ```
 
 ## STI Models
