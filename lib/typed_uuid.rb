@@ -35,7 +35,22 @@ module TypedUUID
       timestamp  ||= Time.now
 
       uuid = [timestamp.to_i * 1_000_000 + timestamp.usec].pack('Q>')[1..-1]
-      uuid << (sequence&.pack('Q>') || SecureRandom.random_bytes(10))
+      uuid << if sequence.nil?
+        SecureRandom.random_bytes(8)
+      elsif sequence.is_a?(Integer)
+        sequence = [sequence].pack("Q>")
+        if sequence.bytesize == 8 && sequence[0..1] == "\x00\x00"
+          sequence[2..]
+        else
+          raise ArgumentError, 'Sequence is more than 6 bytes'
+        end
+      elsif sequence.is_a?(String)
+        raise ArgumentError, 'Sequence is more than 6 bytes' if sequence.bytesize > 6
+        sequence.b
+      else
+        raise ArgumentError, 'Unable to convert sequence to binary'
+      end
+      uuid << SecureRandom.random_bytes(4)
 
       uuid = uuid.unpack("nnnnnnnn")
       uuid[7] = (uuid[2] ^ uuid[6]) ^ ((enum << 3) | 1)
@@ -61,6 +76,15 @@ module TypedUUID
     def timestamp(uuid)
       uuid = uuid.gsub('-', '')
       Time.at(*uuid[0..13].to_i(16).divmod(1_000_000), :usec)
+    end
+
+    def sequence_b(uuid)
+      uuid = uuid.gsub('-', '')
+      uuid[14..25].scan(/.{4}/).map{|i| i.to_i(16) }.pack('n*').b
+    end
+    
+    def sequence(uuid)
+      ("\x00\x00" + sequence_b(uuid)).unpack1('Q>')
     end
 
   end
