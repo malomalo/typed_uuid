@@ -39,21 +39,21 @@ module TypedUUID
         SecureRandom.random_bytes(8)
       elsif sequence.is_a?(Integer)
         sequence = [sequence].pack("Q>")
-        if sequence.bytesize == 8 && sequence[0..1] == "\x00\x00"
-          sequence[2..]
+        if sequence.bytesize == 8 && sequence[0] == "\x00"
+          sequence[1..]
         else
-          raise ArgumentError, 'Sequence is more than 6 bytes'
+          raise ArgumentError, 'Sequence must be less than 8 bytes'
         end
       elsif sequence.is_a?(String)
-        raise ArgumentError, 'Sequence is more than 6 bytes' if sequence.bytesize > 6
+        raise ArgumentError, 'Sequence must be less than 8 bytes' if sequence.bytesize > 7
         sequence.b
       else
         raise ArgumentError, 'Unable to convert sequence to binary'
       end
-      uuid << SecureRandom.random_bytes(4)
+      uuid << "\x00\x00"
 
       uuid = uuid.unpack("nnnnnnnn")
-      uuid[7] = (uuid[2] ^ uuid[6]) ^ ((enum << 3) | 1)
+      uuid[7] = ((uuid[2] ^ uuid[6]) ^ ((enum << 3) | 1))
       "%04x%04x-%04x-%04x-%04x-%04x%04x%04x" % uuid
     end
 
@@ -80,11 +80,11 @@ module TypedUUID
 
     def sequence_b(uuid)
       uuid = uuid.gsub('-', '')
-      uuid[14..25].scan(/.{4}/).map{|i| i.to_i(16) }.pack('n*').b
+      uuid[14..30].scan(/.{4}/).map{|i| i.to_i(16) }.pack('n*').b[0..-2]
     end
-    
+
     def sequence(uuid)
-      ("\x00\x00" + sequence_b(uuid)).unpack1('Q>')
+      ("\x00" + sequence_b(uuid)).unpack1('Q>')
     end
 
   end

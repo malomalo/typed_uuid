@@ -31,9 +31,9 @@ Typed UUID will give us back the ENUM and Version of the Type using soley the UU
 As with regular UUID Typed UUIDs come in multiple version. The current versions are:
 
 - Version 1: A timebased UUID where the first 56 bits are an unsigned integer
-             representing the microseconds since epoch. Followed by 48 random
-             bits or a sequence counter. Then 8 random bits followed by 16 bits
-             which are the UUID type.
+             representing the microseconds since epoch. Followed by 56 random
+             bits or a sequence counter. Followed by 16 bits which are the UUID
+             type.
 
 - Version 3: A name-based UUID where the first 112 bits are based off the MD5
              digest of the namespace and name. The following 16 bits are the
