@@ -12,8 +12,8 @@ class AddTypedUuidFunction < ActiveRecord::Migration[6.0]
         BEGIN
           IF version = 1 THEN
             bytes := decode(concat(
-                lpad(right(to_hex((extract(epoch from clock_timestamp())*1000000)::bigint), 12), 12, '0'),
-                encode(gen_random_bytes(10), 'hex')
+                lpad(right(to_hex((extract(epoch from clock_timestamp())*1000000)::bigint), 14), 14, '0'),
+                encode(gen_random_bytes(9), 'hex')
             ), 'hex');
           ELSE
             bytes := gen_random_bytes(16);
