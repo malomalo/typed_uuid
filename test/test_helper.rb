@@ -101,18 +101,15 @@ class ActiveSupport::TestCase
     if patterns_to_match.all? { |s| s.is_a?(String) } && patterns_to_match.size > 1
       assert_equal(*patterns_to_match.take(2).map { |sql| sql.gsub(/( +|\n\s*|\s+)/, ' ').strip })
     else
-      begin
-        ret_value = nil
-        capture_sql { ret_value = yield }
-        ret_value
-      ensure
-        patterns_to_match.map! {|p| p.is_a?(String) ? p.gsub(/( +|\n\s*|\s+)/, ' ').strip : p }
-        failed_patterns = []
-        patterns_to_match.each do |pattern|
-          failed_patterns << pattern unless SQLLogger.log_all.any?{ |sql| pattern === sql.gsub(/( +|\n\s*|\s+)/, ' ').strip }
-        end
-        assert failed_patterns.empty?, "Query pattern(s) #{failed_patterns.map(&:inspect).join(', ')} not found.#{SQLLogger.log.size == 0 ? '' : "\nQueries:\n#{SQLLogger.log.join("\n")}"}"
+      ret_value = nil
+      capture_sql { ret_value = yield }
+      patterns_to_match.map! {|p| p.is_a?(String) ? p.gsub(/( +|\n\s*|\s+)/, ' ').strip : p }
+      failed_patterns = []
+      patterns_to_match.each do |pattern|
+        failed_patterns << pattern unless SQLLogger.log_all.any?{ |sql| pattern === sql.gsub(/( +|\n\s*|\s+)/, ' ').strip }
       end
+      assert failed_patterns.empty?, "Query pattern(s) #{failed_patterns.map(&:inspect).join(', ')} not found.#{SQLLogger.log.size == 0 ? '' : "\nQueries:\n#{SQLLogger.log.join("\n")}"}"
+      ret_value
     end
   end
 

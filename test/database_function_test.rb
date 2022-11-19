@@ -21,6 +21,17 @@ class DatabaseFunctionTest < ActiveSupport::TestCase
   class Sea < ActiveRecord::Base
   end
 
+  class ApplicationRecord < ActiveRecord::Base
+    primary_abstract_class
+  end
+
+  class Bird < ApplicationRecord
+    self.abstract_class = true
+  end
+  
+  class Emu < Bird
+  end
+
   test 'adding primary key as a typed_uuid in a migration' do
     ActiveRecord::Base.register_uuid_types({
       1 => 'DatabaseFunctionTest::Sailor'
@@ -51,6 +62,25 @@ class DatabaseFunctionTest < ActiveSupport::TestCase
     assert_sql exprexted_sql do
       ActiveRecord::Migration.suppress_messages do
         ActiveRecord::Migration.create_table :seas, id: :typed_uuid do |t|
+          t.string   "name",                    limit: 255
+        end
+      end
+    end
+  end
+
+  test 'adding primary key as a typed_uuid in a migration to a STI table' do
+    ActiveRecord::Base.register_uuid_types({
+      30 => 'DatabaseFunctionTest::Bird',
+      31 => 'DatabaseFunctionTest::Emu'
+    })
+
+    exprexted_sql = <<-SQL
+      CREATE TABLE "birds" ("id" uuid DEFAULT typed_uuid(30, 4) NOT NULL PRIMARY KEY, "name" character varying(255))
+    SQL
+    
+    assert_sql exprexted_sql do
+      ActiveRecord::Migration.suppress_messages do
+        ActiveRecord::Migration.create_table :birds, id: :typed_uuid do |t|
           t.string   "name",                    limit: 255
         end
       end

@@ -117,10 +117,7 @@ module TypedUUID::ActiveRecord
       Rails.application.eager_load! if !Rails.application.config.eager_load
     
       ::ActiveRecord::Base.descendants.find do |klass|
-        next unless ( klass.superclass == ::ActiveRecord::Base || klass.superclass.abstract_class? )
-        next if klass.table_name.nil?
-
-        klass.table_name == table
+        (klass.table_name || klass.send(:compute_table_name)) == table
       end
     end
   
