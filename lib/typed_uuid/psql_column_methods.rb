@@ -4,7 +4,6 @@ module TypedUUID::PsqlColumnMethods
     if type == :typed_uuid
       klass_type_enum = ::ActiveRecord::Base.uuid_enum_from_table_name(self.name)
       klass_type_version = ::ActiveRecord::Base.uuid_version_from_table_name(self.name)
-      options[:id] = :uuid
       options[:default] ||= -> { "typed_uuid(#{klass_type_enum}, #{klass_type_version})" }
       super(name, :uuid, **options)
     else
