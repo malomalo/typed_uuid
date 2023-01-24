@@ -1,7 +1,7 @@
 class TypedUUID::Railtie < Rails::Railtie
 
   initializer :typed_uuid do |app|
-    ActiveRecord::Tasks::DatabaseTasks.migrations_paths << File.expand_path('../../../db/migrate', __FILE__)
+    ActiveRecord::Tasks::DatabaseTasks.migrations_paths << TypedUUID::MIGRATIONS_PATH
 
     ActiveSupport.on_load(:active_record) do
       ActiveRecord::Base.include TypedUUID::ActiveRecord

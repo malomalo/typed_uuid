@@ -1,6 +1,8 @@
 require 'digest/sha1'
 
 module TypedUUID
+  MIGRATIONS_PATH = File.expand_path('../../db/migrate', __FILE__)
+  
   autoload :ActiveRecord, 'typed_uuid/active_record'
   autoload :PsqlColumnMethods, 'typed_uuid/psql_column_methods'
   autoload :PsqlSchemaDumper, 'typed_uuid/psql_schema_dumper'
