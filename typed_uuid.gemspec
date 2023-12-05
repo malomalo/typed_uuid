@@ -22,10 +22,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'byebug'
-  s.add_development_dependency 'activesupport', '>= 6.0.0'
-  s.add_development_dependency 'rails', '>= 6.1.0'
+  s.add_development_dependency 'activesupport', '>= 7.0.0'
+  s.add_development_dependency 'rails', '>= 7.0.0'
   s.add_development_dependency 'pg'
 
   # Runtime
-  s.add_runtime_dependency 'activerecord', '>= 6.1.0'
+  s.add_runtime_dependency 'activerecord', '>= 7.0.0'
 end

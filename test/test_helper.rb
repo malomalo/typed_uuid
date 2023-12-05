@@ -65,7 +65,8 @@ class ActiveSupport::TestCase
       ActiveRecord::Base.establish_connection(configuration)
 
       db_tasks = ActiveRecord::Tasks::PostgreSQLDatabaseTasks.new(ActiveRecord::Base.connection_db_config)
-      db_tasks.purge
+      db_tasks.drop
+      db_tasks.create
 
       ActiveRecord::Migration.suppress_messages do
         AddTypedUuidFunction.migrate :up
