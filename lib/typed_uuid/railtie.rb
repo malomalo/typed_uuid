@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TypedUUID::Railtie < Rails::Railtie
 
   initializer :typed_uuid do |app|

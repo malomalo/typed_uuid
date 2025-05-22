@@ -8,18 +8,21 @@ on:
 jobs:
   test:
     name: TypedUUID Test
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
         rails-version:
-          - 7.0.8
-          - 7.1.2
+          - 7.1
+          - 7.2
+          - 8.0
         ruby-version:
-          - 3.0
-          - 3.1
           - 3.2
+          - 3.3
+          - 3.4
+          - 3.5.0-preview1
         postgres-version:
-          - 15
+          - 17
 
     steps:
       - name: Install Postgresql
@@ -37,6 +40,13 @@ jobs:
           sudo -u postgres psql -c "ALTER USER runner WITH PASSWORD 'runner';"
 
       - uses: actions/checkout@v4
+
+      - name: Add logger for Ruby 3.5 (no longer bundled gem, drop when rails adds)
+        run: |
+          echo ""  >> Gemfile
+          echo 'gem "logger"' >> Gemfile
+          echo ""  >> Gemfile
+          echo 'gem "benchmark"' >> Gemfile
 
       - run: |
           echo 'gem "rails", "${{ matrix.rails-version }}"' >> Gemfile

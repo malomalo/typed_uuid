@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TypedUUID::PsqlColumnMethods
 
   def primary_key(name, type = :primary_key, **options)
