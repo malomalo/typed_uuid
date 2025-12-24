@@ -16,11 +16,11 @@ jobs:
           - 7.1
           - 7.2
           - 8.0
+          - 8.1
         ruby-version:
-          - 3.2
           - 3.3
           - 3.4
-          - 3.5.0-preview1
+          - 4.0.0-preview2
         postgres-version:
           - 17
 
