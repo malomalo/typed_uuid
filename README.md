@@ -95,10 +95,11 @@ To add a typed UUID to an existing table:
 ```ruby
 class UpdateProperties < ActiveRecord::Migration[6.1]
   def change
-    klass_enum = ::ActiveRecord::Base.uuid_type_from_table_name(:properties)
+    klass_type_enum = ::ActiveRecord::Base.uuid_enum_from_table_name(:properties)
+    klass_type_version = ::ActiveRecord::Base.uuid_version_from_table_name(:properties)
 
     # Add the column
-    add_column :properties, :typed_uuid, :uuid, default: -> { "typed_uuid('\\x#{klass_enum.to_s(16).rjust(4, '0')}')" }
+    add_column :properties, :typed_uuid, :uuid, default: -> { "typed_uuid(#{klass_type_enum}, #{klass_type_version})" }
 
     # Update existing properties with a new typed UUID
     execute "UPDATE properties SET id = typed_uuid('\\x#{klass_enum.to_s(16).rjust(4, '0')}');"
